@@ -197,8 +197,9 @@ services:
       - "443:443"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - /etc/letsencrypt/live/n8nbba.fun:/etc/nginx/ssl:ro
-    depends_on:
+      - /etc/letsencrypt/live/n8nbba.fun:/etc/nginx/ssl/live/n8nbba.fun:ro
+      - /etc/letsencrypt/archive/n8nbba.fun:/etc/nginx/ssl/archive/n8nbba.fun:ro
+    depends_on: 
       - kong
       - n8n
       - studio
