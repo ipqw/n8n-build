@@ -18,9 +18,17 @@ services:
       - WEBHOOK_URL=https://${SUBDOMAIN}.${DOMAIN_NAME}/
       - GENERIC_TIMEZONE=${GENERIC_TIMEZONE}
       - TZ=${GENERIC_TIMEZONE}
+      - NODE_OPTIONS=--max-old-space-size=384
     volumes:
       - n8n_data:/home/node/.n8n
       - ./local-files:/files
+    mem_limit: "512m"
+    cpus: "1.0"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   nginx:
     image: nginx:alpine
@@ -37,14 +45,21 @@ services:
       - "443:443"
     depends_on:
       - n8n
-      - studio
     restart: unless-stopped
+    mem_limit: "128m"
+    cpus: "0.5"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   studio:
     container_name: supabase-studio
     image: supabase/studio:2025.06.30-sha-6f5982d
     restart: unless-stopped
     networks: [app-network]
+    profiles: ["supabase"]
     healthcheck:
       test:
         [
@@ -86,6 +101,7 @@ services:
     image: kong:2.8.1
     restart: unless-stopped
     networks: [app-network]
+    profiles: ["supabase"]
     expose: ["${KONG_HTTP_PORT}:8000/tcp", "${KONG_HTTPS_PORT}:8443/tcp"]
     volumes:
       # https://github.com/supabase/supabase/issues/12661
@@ -113,6 +129,7 @@ services:
     image: supabase/gotrue:v2.177.0
     restart: unless-stopped
     networks: [app-network]
+    profiles: ["supabase"]
     healthcheck:
       test:
         [
@@ -197,6 +214,7 @@ services:
     image: postgrest/postgrest:v12.2.12
     restart: unless-stopped
     networks: [app-network]
+    profiles: ["supabase"]
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -222,6 +240,7 @@ services:
     image: supabase/realtime:v2.34.47
     restart: unless-stopped
     networks: [app-network]
+    profiles: ["supabase"]
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -268,6 +287,7 @@ services:
     image: supabase/storage-api:v1.25.7
     restart: unless-stopped
     networks: [app-network]
+    profiles: ["supabase"]
     volumes:
       - ./supabase/volumes/storage:/var/lib/storage:z
     healthcheck:
@@ -289,8 +309,6 @@ services:
         condition: service_healthy
       rest:
         condition: service_started
-      imgproxy:
-        condition: service_started
     environment:
       ANON_KEY: ${ANON_KEY}
       SERVICE_KEY: ${SERVICE_ROLE_KEY}
@@ -304,7 +322,7 @@ services:
       # TODO: https://github.com/supabase/storage-api/issues/55
       REGION: stub
       GLOBAL_S3_BUCKET: stub
-      ENABLE_IMAGE_TRANSFORMATION: "true"
+      ENABLE_IMAGE_TRANSFORMATION: "false"
       IMGPROXY_URL: http://imgproxy:5001
 
   imgproxy:
@@ -312,6 +330,7 @@ services:
     image: darthsim/imgproxy:v3.8.0
     restart: unless-stopped
     networks: [app-network]
+    profiles: ["supabase"]
     volumes:
       - ./supabase/volumes/storage:/var/lib/storage:z
     healthcheck:
@@ -335,6 +354,7 @@ services:
     image: supabase/postgres-meta:v0.91.0
     restart: unless-stopped
     networks: [app-network]
+    profiles: ["supabase"]
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -354,6 +374,7 @@ services:
     image: supabase/edge-runtime:v1.67.4
     restart: unless-stopped
     networks: [app-network]
+    profiles: ["supabase"]
     volumes:
       - ./supabase/volumes/functions:/home/deno/functions:Z
     depends_on:
@@ -379,6 +400,7 @@ services:
     image: supabase/logflare:1.14.2
     restart: unless-stopped
     networks: [app-network]
+    profiles: ["supabase"]
     expose: ["4000"]
     # Uncomment to use Big Query backend for analytics
     # volumes:
@@ -428,6 +450,7 @@ services:
     image: supabase/postgres:15.8.1.060
     restart: unless-stopped
     networks: [app-network]
+    profiles: ["supabase"]
     volumes:
       - ./supabase/volumes/db/realtime.sql:/docker-entrypoint-initdb.d/migrations/99-realtime.sql:Z
       # Must be superuser to create event trigger
@@ -486,6 +509,7 @@ services:
     image: timberio/vector:0.28.1-alpine
     restart: unless-stopped
     networks: [app-network]
+    profiles: ["supabase"]
     volumes:
       - ./supabase/volumes/logs/vector.yml:/etc/vector/vector.yml:ro,z
       - ${DOCKER_SOCKET_LOCATION}:/var/run/docker.sock:ro,z
@@ -518,6 +542,7 @@ services:
     image: supabase/supavisor:2.5.7
     restart: unless-stopped
     networks: [app-network]
+    profiles: ["supabase"]
     expose: ["${POSTGRES_PORT}:5432", "${POOLER_PROXY_PORT_TRANSACTION}:6543"]
     volumes:
       - ./supabase/volumes/pooler/pooler.exs:/etc/pooler/pooler.exs:ro,z
