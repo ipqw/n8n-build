@@ -57,7 +57,6 @@ services:
     image: supabase/studio:2025.06.30-sha-6f5982d
     restart: unless-stopped
     networks: [app-network]
-    profiles: ["supabase"]
     healthcheck:
       test:
         [
@@ -99,7 +98,6 @@ services:
     image: kong:2.8.1
     restart: unless-stopped
     networks: [app-network]
-    profiles: ["supabase"]
     expose: ["${KONG_HTTP_PORT}:8000/tcp", "${KONG_HTTPS_PORT}:8443/tcp"]
     volumes:
       # https://github.com/supabase/supabase/issues/12661
@@ -127,7 +125,6 @@ services:
     image: supabase/gotrue:v2.177.0
     restart: unless-stopped
     networks: [app-network]
-    profiles: ["supabase"]
     healthcheck:
       test:
         [
@@ -212,7 +209,6 @@ services:
     image: postgrest/postgrest:v12.2.12
     restart: unless-stopped
     networks: [app-network]
-    profiles: ["supabase"]
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -238,7 +234,6 @@ services:
     image: supabase/realtime:v2.34.47
     restart: unless-stopped
     networks: [app-network]
-    profiles: ["supabase"]
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -285,7 +280,6 @@ services:
     image: supabase/storage-api:v1.25.7
     restart: unless-stopped
     networks: [app-network]
-    profiles: ["supabase"]
     volumes:
       - ./supabase/volumes/storage:/var/lib/storage:z
     healthcheck:
@@ -328,7 +322,6 @@ services:
     image: darthsim/imgproxy:v3.8.0
     restart: unless-stopped
     networks: [app-network]
-    profiles: ["supabase"]
     volumes:
       - ./supabase/volumes/storage:/var/lib/storage:z
     healthcheck:
@@ -352,7 +345,6 @@ services:
     image: supabase/postgres-meta:v0.91.0
     restart: unless-stopped
     networks: [app-network]
-    profiles: ["supabase"]
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -372,7 +364,6 @@ services:
     image: supabase/edge-runtime:v1.67.4
     restart: unless-stopped
     networks: [app-network]
-    profiles: ["supabase"]
     volumes:
       - ./supabase/volumes/functions:/home/deno/functions:Z
     depends_on:
@@ -398,7 +389,6 @@ services:
     image: supabase/logflare:1.14.2
     restart: unless-stopped
     networks: [app-network]
-    profiles: ["supabase"]
     expose: ["4000"]
     # Uncomment to use Big Query backend for analytics
     # volumes:
@@ -448,7 +438,6 @@ services:
     image: supabase/postgres:15.8.1.060
     restart: unless-stopped
     networks: [app-network]
-    profiles: ["supabase"]
     volumes:
       - ./supabase/volumes/db/realtime.sql:/docker-entrypoint-initdb.d/migrations/99-realtime.sql:Z
       # Must be superuser to create event trigger
@@ -507,7 +496,6 @@ services:
     image: timberio/vector:0.28.1-alpine
     restart: unless-stopped
     networks: [app-network]
-    profiles: ["supabase"]
     volumes:
       - ./supabase/volumes/logs/vector.yml:/etc/vector/vector.yml:ro,z
       - ${DOCKER_SOCKET_LOCATION}:/var/run/docker.sock:ro,z
@@ -540,7 +528,6 @@ services:
     image: supabase/supavisor:2.5.7
     restart: unless-stopped
     networks: [app-network]
-    profiles: ["supabase"]
     expose: ["${POSTGRES_PORT}:5432", "${POOLER_PROXY_PORT_TRANSACTION}:6543"]
     volumes:
       - ./supabase/volumes/pooler/pooler.exs:/etc/pooler/pooler.exs:ro,z
