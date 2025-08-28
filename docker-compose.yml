@@ -45,7 +45,7 @@ services:
       - "443:443"
     depends_on:
       - n8n
-      - supabase-kong
+      - kong
     restart: unless-stopped
     mem_limit: "128m"
     cpus: "0.5"
