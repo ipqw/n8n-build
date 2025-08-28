@@ -28,10 +28,7 @@ services:
     networks: [app-network]
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./etc/letsencrypt/live/n8n.n8nbba.fun/fullchain.pem:/etc/nginx/ssl/n8n.n8nbba.fun/fullchain.pem:ro
-      - ./etc/letsencrypt/live/n8n.n8nbba.fun/privkey.pem:/etc/nginx/ssl/n8n.n8nbba.fun/privkey.pem:ro
-      - ./etc/letsencrypt/live/supabase.n8nbba.fun/fullchain.pem:/etc/nginx/ssl/supabase.n8nbba.fun/fullchain.pem:ro
-      - ./etc/letsencrypt/live/supabase.n8nbba.fun/privkey.pem:/etc/nginx/ssl/supabase.n8nbba.fun/privkey.pem:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
     ports:
       - "80:80"
       - "443:443"
