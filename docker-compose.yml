@@ -22,13 +22,6 @@ services:
     volumes:
       - n8n_data:/home/node/.n8n
       - ./local-files:/files
-    mem_limit: "512m"
-    cpus: "1.0"
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
 
   nginx:
     image: nginx:alpine
@@ -45,15 +38,8 @@ services:
       - "443:443"
     depends_on:
       - n8n
-      - kong
+      - supabase-kong
     restart: unless-stopped
-    mem_limit: "128m"
-    cpus: "0.5"
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
 
   studio:
     container_name: supabase-studio
